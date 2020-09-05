@@ -60,13 +60,6 @@ def home(request: Request, percent_profit = None, price_to_execute = None, in_th
 def fetch_stock_data(symbol: str):
     db = SessionLocal()
     stock = db.query(Stock).filter(Stock.symbol == symbol).first()
-    # strike_db = Strike()
-    # finds the stocks id in the table, matches the data, in this case price, and 
-    # inserts it into its specific spot
-    # why won't the stock symbol filter down to the other tables?
-    # the expiration table query needs to create as many rows as there is expiration dates, 
-    # insert copies of the ticker name in each row, 
-    # and give each expiration date its own id--same thing for strike
 
     yahoo_data = yfinance.Ticker(stock.symbol)
     exp_list = list(yahoo_data.options)
@@ -75,7 +68,6 @@ def fetch_stock_data(symbol: str):
     price = {}
     profit = {}
     in_the_money = {}
-    # open_interest = {}
 
     for i in exp_list:
         opt = yahoo_data.option_chain(i) 
@@ -96,10 +88,6 @@ def fetch_stock_data(symbol: str):
         in_the_money[i] = opt.calls['inTheMoney']
         itm_value = in_the_money.values()
         itm_list = list(itm_value)
-        # open_interest[i] = opt.calls['openInterest']
-        # oi_value = open_interest.values()
-        # oi_list = list(oi_value)
-
     
     stock.price = price_total
     exps = []
@@ -121,9 +109,6 @@ def fetch_stock_data(symbol: str):
     itm_df = pd.DataFrame(itm_list)
     itm_listee = itm_df.values.tolist()
     itm_final = [[x for x in y if not np.isnan(x)] for y in itm_listee]
-    # oi_df = pd.DataFrame(oi_list)
-    # oi_listee = oi_df.values.tolist()
-    # oi_final = [[x for x in y if not np.isnan(x)] for y in oi_listee]
     strk = []
     for strike_group, contract_group, p2e_group, p_profit_group, itm_group, date in zip(strike_final, contract_final, p2e_final, p_profit_final, itm_final, exp_list):
         for strikes, contracts, p2es, p_profits, itms in zip(strike_group, contract_group, p2e_group, p_profit_group, itm_group):
