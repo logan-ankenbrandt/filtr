@@ -28,7 +28,6 @@ class Strike(Base):
     price_to_execute = Column(Float)
     percent_profit = Column(Float)
     in_the_money = Column(Boolean)
-    # open_interest = Column(Float)
 
 
 
