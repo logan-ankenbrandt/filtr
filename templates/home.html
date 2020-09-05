@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script>
+    $(document).ready(function () {
+        $("#add_stocks").click(function () {
+            $('.ui.modal').modal('show');
+        })
+        $("#save").click(function () {
+            var symbols = $("#symbols").val();
+
+            console.log(symbols);
+
+            var stockSymbols = symbols.split("\n");
+
+            console.log(stockSymbols)
+            for (var i = 0; i < stockSymbols.length; ++i) {
+                console.log(stockSymbols[i]);
+
+                $.ajax({
+                    url: '/stock',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ "symbol": stockSymbols[i] }),
+                    dataType: 'json'
+                })
+            }
+
+            $('.ui.modal').modal('hide');
+        })
+    });
+</script>
+<form action="">
+    <div class="ui input">
+        <input name="percent_profit" type="text" placeholder="Percent Profit" value="{{ percent_profit or '' }}">
+    </div>
+
+    <div class="ui input">
+        <input name="price_to_execute" type="text" placeholder="Price to Execute" value="{{ price_to_execute or '' }}">
+    </div>
+
+    <div class="ui input">
+        <input name="in_the_money" type="text" placeholder="In the Money" value="{{ in_the_money or '' }}">
+    </div>
+
+    <button type="submit" class="ui button primary">filtr</button>
+</form>
+<div>
+    <button id="add_stocks" class="ui button">Add Stocks</button>
+</div>
+
+<table class="ui celled table">
+    <thead>
+        <tr>
+            <th>Symbol</th>
+            <th>Price</th>
+            <th>Expiration Date</th>
+            <th>Strike Price</th>
+            <th>Contract Price</th>
+            <th>Price to Execute</th>
+            <th>Percent Profit</th>
+            <th>In the Money</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stock in stocks %}
+        {% for expiration in expirations %}
+        {% for strike in strikes %}
+        <tr>
+            <td>{{ stock.symbol }}</td>
+            <td>{{ stock.price }}</td>
+            <td>{{ expiration.exp_list }}</td>
+            <td>{{ strike.strike_price }}</td>
+            <td>{{ strike.contract_price }}</td>
+            <td>{{ strike.price_to_execute }}</td>
+            <td>{{ strike.percent_profit }}</td>
+            <td>{{ strike.in_the_money }}</td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="ui modal">
+    <i class="close icon"></i>
+    <div class="header">
+        Add Stocks
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <div class="field">
+                <label>Symbols</label>
+                <textarea id="symbols"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <div id="save" class="ui positive right labeled icon button">
+            Add Symbols
+            <i class="plus icon"></i>
+        </div>
+    </div>
+</div>
+{% endblock %}
